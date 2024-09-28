@@ -1,11 +1,13 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, Inject, Query } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import { ApiTags } from '@nestjs/swagger';
 
 import { CUSTOMER_MICROSERVICE } from 'src/config';
 import { CreateCustomerDto } from '../dto/create-customer.dto';
 import { UpdateCustomerDto } from '../dto/update-customer.dto';
 import { PaginationDto } from 'src/common';
 
+@ApiTags('Customer')
 @Controller('customer')
 export class CustomerController {
   constructor(@Inject(CUSTOMER_MICROSERVICE) private readonly client: ClientProxy) {}

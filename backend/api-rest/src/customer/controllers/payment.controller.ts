@@ -1,11 +1,12 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, Inject } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import { ApiTags } from '@nestjs/swagger';
 
 import { CUSTOMER_MICROSERVICE } from 'src/config';
 import { CreatePaymentDto } from '../dto/create-payment.dto';
 import { ConfirmPaymentDto } from '../dto/confirm-payment.dto';
 
-
+@ApiTags('Payment')
 @Controller('payment')
 export class PaymentController {
   constructor(@Inject(CUSTOMER_MICROSERVICE) private readonly client: ClientProxy) {}
