@@ -18,6 +18,6 @@ export class PaymentController {
 
   @Post('confirm')
   confirm(@Body() confirmPaymentDto: ConfirmPaymentDto) {
-    return this.client.send({ cmd: 'create_payment' }, confirmPaymentDto);
+    return this.client.send({ cmd: 'confirm_payment' }, confirmPaymentDto);
   }
 }
