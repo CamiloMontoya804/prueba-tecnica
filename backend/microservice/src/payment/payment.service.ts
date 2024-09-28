@@ -16,13 +16,14 @@ export class PaymentService {
 
   async createPayment(createPaymentDto: CreatePaymentDto) {
     const { document, phone, amount } = createPaymentDto;
-    const { id, balance, payments } = await this.prisma.customer.findFirstOrThrow({
+    const { id, balance, payments, email } = await this.prisma.customer.findFirstOrThrow({
       where: {
         document: document,
         phone: phone
       },
       select: {
         id: true,
+        email: true,
         balance: true,
         payments: true,
       }
@@ -44,7 +45,7 @@ export class PaymentService {
     const token = generateAlphanumericToken();
     const code = generateAlphanumericToken(10);
     
-    this.prisma.payment.create({
+    await this.prisma.payment.create({
       data: {
         code: code,
         token: token,
@@ -56,6 +57,7 @@ export class PaymentService {
     return {
       code: code,
       token: token,
+      email: email,
       customerId: id,
     }
   }

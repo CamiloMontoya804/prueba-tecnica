@@ -58,6 +58,12 @@ export class CustomerService {
   create(createCustomerDto: CreateCustomerDto) {
     return this.prisma.customer.create({
       data: createCustomerDto,
+      select: {
+        document: true,
+        name: true,
+        phone: true,
+        email: true,
+      }
     });
   }
 
