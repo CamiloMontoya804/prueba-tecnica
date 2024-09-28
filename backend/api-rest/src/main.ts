@@ -1,4 +1,4 @@
-import { NestFactory } from '@nestjs/core';
+import { APP_FILTER, NestFactory } from '@nestjs/core';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 
@@ -30,6 +30,8 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("docs", app, document);
+
+  app.enableCors();
 
   await app.listen(envs.port);
 
