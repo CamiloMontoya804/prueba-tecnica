@@ -1,0 +1,28 @@
+version: '3'
+services:
+  api:
+    build: ./backend/api-rest
+    ports:
+      - "4000:4000"
+    depends_on:
+      - microservice
+    networks:
+      - mynetwork
+
+  microservice:
+    build: ./backend/microservice
+    ports:
+      - "4001:4001"
+    networks:
+      - mynetwork
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:4000
+
+networks:
+  mynetwork:
+    driver: bridge
