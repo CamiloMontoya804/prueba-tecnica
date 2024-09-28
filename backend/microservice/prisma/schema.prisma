@@ -15,12 +15,35 @@ datasource db {
 
 model Customer {
   id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  document    String  @unique
   name        String
-  phone       String
+  phone       String  @unique
   email       String  @unique
   balance     Float   @default(0)
   available   Boolean @default(true)
 
+  payments    Payment[]
+
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
+}
+
+model Payment {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  code        String  @unique
+  amount      Float
+  token       String
+  status      Status @default(PENDING)
+
+  customerId  String @db.ObjectId
+  customer    Customer   @relation(fields: [customerId], references: [id])
+
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+}
+
+enum Status {
+  FAILED
+  PENDING
+  SUCCESS
 }
