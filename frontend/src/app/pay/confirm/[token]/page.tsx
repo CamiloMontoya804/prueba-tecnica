@@ -4,12 +4,18 @@ import { confirmPayment } from "@/api/payment.api";
 import { CheckCircle2 } from 'lucide-react'
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { CheckCircle2 } from 'lucide-react'
+import Link from "next/link";
+
+import { confirmPayment } from "@/api/payment.api";
+import { formatDate, formatTime } from "@/utils/utils";
 
 interface Payment {
   code: string
   description: string
   amount: number
   status: string
+  updated_at: string
 }
 
 interface Props {
@@ -35,6 +41,10 @@ async function PaymentConfirmation({ params }: Props) {
             <Badge variant="secondary" className="text-lg px-3 py-1">
               {payment.status}
             </Badge>
+          </div>
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-gray-500">Fecha de pago</p>
+            <p className="text-lg font-semibold">{formatDate(payment.updated_at)} {formatTime(payment.updated_at)}</p>
           </div>
           <div className="space-y-2">
             <p className="text-sm font-medium text-gray-500">Código de Pago</p>

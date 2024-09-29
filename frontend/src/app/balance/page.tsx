@@ -15,13 +15,15 @@ import {
 } from "@/components/ui/table"
 import { useToast } from "@/hooks/use-toast"
 import { useForm } from 'react-hook-form';
+
 import { getCustomerBalance } from '@/api/customers.api'
+import { formatDate, formatTime } from '@/utils/utils'
 
 interface BalanceData {
   balance: number
-  transactions: Array<{
+  payments: Array<{
     id: number
-    date: string
+    updated_at: string
     description: string
     amount: number
   }>
@@ -36,7 +38,7 @@ export default function BalanceCheck() {
   const { register, handleSubmit, reset } = useForm<QueryData>();
   const [balanceData, setBalanceData] = useState<BalanceData>({
     balance: -1,
-    transactions: []
+    payments: []
   })
   const [showBalance, setShowBalance] = useState<boolean>(false)
   const { toast } = useToast()
@@ -117,17 +119,19 @@ export default function BalanceCheck() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Fecha</TableHead>
+                    <TableHead>Hora</TableHead>
                     <TableHead>Motivo</TableHead>
                     <TableHead>Monto</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {(balanceData.transactions || []).map((transaction) => (
-                    <TableRow key={transaction.id}>
-                      <TableCell>{transaction.date}</TableCell>
-                      <TableCell>{transaction.description}</TableCell>
-                      <TableCell className={transaction.amount > 0 ? "text-green-600" : "text-red-600"}>
-                        ${Math.abs(transaction.amount).toFixed(2)}
+                  {(balanceData.payments || []).map((payment) => (
+                    <TableRow key={payment.id}>
+                      <TableCell>{formatDate(payment.updated_at)}</TableCell>
+                      <TableCell>{formatTime(payment.updated_at)}</TableCell>
+                      <TableCell>{payment.description}</TableCell>
+                      <TableCell className={payment.amount > 0 ? "text-green-600" : "text-red-600"}>
+                        ${Math.abs(payment.amount).toFixed(2)}
                       </TableCell>
                     </TableRow>
                   ))}
