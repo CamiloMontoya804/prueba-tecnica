@@ -24,7 +24,7 @@ interface Client {
 export const dynamic = "force-dynamic";
 
 export default async function ClientList() {
-  const { data: clients } = await getCustomers();
+  const { data: customers } = await getCustomers();
 
   return (
     <Card>
@@ -47,13 +47,21 @@ export default async function ClientList() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {(clients || []).map((client: Client) => (
-              <TableRow key={client.id}>
-                <TableCell>{client.name}</TableCell>
-                <TableCell>{client.email}</TableCell>
-                <TableCell>{client.phone}</TableCell>
+            {customers.length > 0 ? (
+              customers.map((client: Client) => (
+                <TableRow key={client.id}>
+                  <TableCell>{client.name}</TableCell>
+                  <TableCell>{client.email}</TableCell>
+                  <TableCell>{client.phone}</TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={3} className="text-center">
+                  No hay clientes registrados.
+                </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </CardContent>

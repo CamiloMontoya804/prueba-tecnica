@@ -28,7 +28,7 @@ async function PaymentConfirmation({ params }: Props) {
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">Pago confirmado exitosamente: {payment.code}</CardTitle>
+          <CardTitle className="text-2xl font-bold">Pago confirmado exitosamente:</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex justify-center">
@@ -48,8 +48,8 @@ async function PaymentConfirmation({ params }: Props) {
             <p className="text-lg font-semibold">{payment.code}</p>
           </div>
           <div className="space-y-2">
-            <p className="text-sm font-medium text-gray-500">Descripción</p>
-            <p className="text-lg">{payment.description}</p>
+            <p className="text-sm font-medium text-gray-500">Motivo</p>
+            <p className="text-lg">Pago</p>
           </div>
           <div className="space-y-2">
             <p className="text-sm font-medium text-gray-500">Monto</p>

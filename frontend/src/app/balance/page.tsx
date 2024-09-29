@@ -25,6 +25,7 @@ interface BalanceData {
     id: number
     updated_at: string
     description: string
+    status: string
     amount: number
   }>
 }
@@ -67,6 +68,8 @@ export default function BalanceCheck() {
       });
     }
   });
+
+  const successfulPayments = (balanceData.payments || []).filter(payment => payment.status === 'SUCCESS');
 
   return (
     <div className="space-y-6">
@@ -126,16 +129,24 @@ export default function BalanceCheck() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {(balanceData.payments || []).map((payment) => (
-                    <TableRow key={payment.id}>
-                      <TableCell>{formatDate(payment.updated_at)}</TableCell>
-                      <TableCell>{formatTime(payment.updated_at)}</TableCell>
-                      <TableCell>{payment.description}</TableCell>
-                      <TableCell className={payment.amount > 0 ? "text-green-600" : "text-red-600"}>
-                        ${Math.abs(payment.amount).toFixed(2)}
+                  {successfulPayments.length > 0 ? (
+                    successfulPayments.map((payment) => (
+                      <TableRow key={payment.id}>
+                        <TableCell>{formatDate(payment.updated_at)}</TableCell>
+                        <TableCell>{formatTime(payment.updated_at)}</TableCell>
+                        <TableCell>Pago</TableCell>
+                        <TableCell className="text-red-600">
+                          ${Math.abs(payment.amount).toFixed(2)}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center">
+                        No hay movimientos disponibles.
                       </TableCell>
                     </TableRow>
-                  ))}
+                  )}
                 </TableBody>
               </Table>
             </CardContent>
