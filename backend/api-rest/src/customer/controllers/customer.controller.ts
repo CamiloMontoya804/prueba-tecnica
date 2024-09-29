@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, Inject, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, Inject, Query, NotFoundException } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiTags } from '@nestjs/swagger';
 
