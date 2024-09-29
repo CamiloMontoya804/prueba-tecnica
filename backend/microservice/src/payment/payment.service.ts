@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
+import * as nodemailer from 'nodemailer';
 
 import { Status } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -37,9 +38,10 @@ export class PaymentService {
     const newBalance = balance - (pendingAmount + amount);
 
     if (newBalance < 0) {
-      throw new RpcException({
-        message: `Have no funds to do the payment`,
-      });
+      return {
+        title: 'ERROR',
+        message: 'No tiene fondos suficientes para realizar el pago.',
+      }
     }
 
     const token = generateAlphanumericToken();
@@ -54,11 +56,35 @@ export class PaymentService {
       },
     });
 
-    return {
-      code: code,
-      token: token,
-      email: email,
-      customerId: id,
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
+      auth: {
+        user: 'perproject2@gmail.com',
+        pass: 'ndmipkhbxbndafwh',
+      },
+    });
+
+    const mailOptions = {
+      from: '"Epayco - Test" <perproject2@gmail.com>',
+      to: email,
+      subject: 'Confirmación de Pago',
+      html: `
+        <p>Su pago ha sido registrado exitosamente</p>
+        <p>Por favor confirme su pago clickando en el siguiente <a href="http://localhost:3000/pay/confirm/${token}">link</a></p>
+      `,
+    };
+
+    try {
+      await transporter.sendMail(mailOptions);
+
+      return {
+        title: 'Exito',
+        message: 'El pago fue realizado correctamente, por favor confirmela con el correo enviado.',
+      }
+    } catch (error) {
+      throw new Error('Hubo un problema al enviar el correo: ' + error.message);
     }
   }
 
@@ -76,19 +102,10 @@ export class PaymentService {
       }
     });
 
-    await this.prisma.payment.update({
-      where: {
-        id: paymentId,
-      },
-      data: {
-        status: Status.SUCCESS,
-      }
-    });
-
     let { id: customerId, balance } = customer;
     const newBalance = balance - amount;
 
-    return await this.prisma.customer.update({
+    await this.prisma.customer.update({
       where: {
         id: customerId,
       },
@@ -97,5 +114,13 @@ export class PaymentService {
       }
     });
 
+    return await this.prisma.payment.update({
+      where: {
+        id: paymentId,
+      },
+      data: {
+        status: Status.SUCCESS,
+      }
+    });
   }
 }
