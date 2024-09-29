@@ -16,7 +16,7 @@ interface CustomerData {
 
 export function RegisterForm() {
 
-  const { register, handleSubmit, reset } = useForm<CustomerData>();
+  const { register, handleSubmit } = useForm<CustomerData>();
   const router = useRouter()
   const { toast } = useToast()
 
@@ -31,6 +31,7 @@ export function RegisterForm() {
       router.push('/');
       router.refresh();
     } catch (err) {
+      console.error("Error al crear el cliente:", err);
       toast({
         title: "Error",
         description: "Hubo un problema al registrar el cliente.",

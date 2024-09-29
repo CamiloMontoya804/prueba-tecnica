@@ -1,7 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import Link from "next/link";
-import { confirmPayment } from "@/api/payment.api";
-import { CheckCircle2 } from 'lucide-react'
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { CheckCircle2 } from 'lucide-react'
@@ -25,7 +22,7 @@ interface Props {
 }
 
 async function PaymentConfirmation({ params }: Props) {
-  const payment = await confirmPayment(params.token);
+  const payment: Payment = await confirmPayment(params.token);
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">

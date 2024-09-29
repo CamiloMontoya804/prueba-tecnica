@@ -11,7 +11,7 @@ import {
 import Link from "next/link"
 import { UserPlus } from "lucide-react"
 
-import SkeletonLoader from "@/components/ui/skeleton-loader"
+// import SkeletonLoader from "@/components/ui/skeleton-loader"
 import { getCustomers } from "@/api/customers.api"
 
 interface Client {
@@ -24,10 +24,7 @@ interface Client {
 export const dynamic = "force-dynamic";
 
 export default async function ClientList() {
-  const { data: clients, loading, error } = await getCustomers({});
-
-  // if (loading) return <SkeletonLoader />
-  // if (error) return <p>Error: {error.message}</p>;
+  const { data: clients } = await getCustomers();
 
   return (
     <Card>

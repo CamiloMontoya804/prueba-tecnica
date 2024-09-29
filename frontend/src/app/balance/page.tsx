@@ -29,13 +29,13 @@ interface BalanceData {
   }>
 }
 
-interface QueryData {
+interface QueryForm {
   document: string;
   phone: string;
 }
 
 export default function BalanceCheck() {
-  const { register, handleSubmit, reset } = useForm<QueryData>();
+  const { register, handleSubmit } = useForm<QueryForm>();
   const [balanceData, setBalanceData] = useState<BalanceData>({
     balance: -1,
     payments: []
@@ -59,6 +59,7 @@ export default function BalanceCheck() {
         setShowBalance(false);
       }
     } catch (err) {
+      console.error("Error al registrar el cliente:", err);
       toast({
         title: "Error",
         description: "Hubo un problema al registrar el cliente.",

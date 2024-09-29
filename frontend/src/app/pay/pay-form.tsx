@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
 import { useForm } from 'react-hook-form';
 
@@ -25,7 +24,9 @@ export function PayForm() {
         title: "Pago creado exitosamente",
         description: "Pendiente de confirmacion, por favor revise su correo.",
       });
+      reset();
     } catch (err) {
+      console.error("Error al registrar el pago:", err);
       toast({
         title: "Error",
         description: "Hubo un problema al realizar el pago.",

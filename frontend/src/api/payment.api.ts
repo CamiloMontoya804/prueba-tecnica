@@ -6,23 +6,21 @@ interface Payment {
   amount: number
 }
 
-interface PaymentDetail {
-  code: string
-  description: string
-  amount: number
-  status: string
-}
+// interface PaymentDetail {
+//   code: string
+//   description: string
+//   amount: number
+//   status: string
+// }
 
 export async function createPayment(payment: Payment) {
-  const res = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PAY}`, {
+  await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PAY}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(payment),
-  })
-
-  const data = await res.json();
+  });
 }
 
 export async function confirmPayment(token: string) {
@@ -33,8 +31,6 @@ export async function confirmPayment(token: string) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ token }),
-  })
-  console.log(res);
-  
+  });
   return await res.json();
 }
