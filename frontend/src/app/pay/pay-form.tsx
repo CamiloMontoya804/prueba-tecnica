@@ -12,17 +12,22 @@ interface Payment {
   amount: number
 }
 
+interface Response {
+  title: string
+  message: string
+}
+
 export function PayForm() {
   const { register, handleSubmit, reset } = useForm<Payment>();
   const { toast } = useToast()
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      await createPayment(data);
+      const res: Response = await createPayment(data);
 
       toast({
-        title: "Pago creado exitosamente",
-        description: "Pendiente de confirmacion, por favor revise su correo.",
+        title: res.title,
+        description: res.message,
       });
       reset();
     } catch (err) {

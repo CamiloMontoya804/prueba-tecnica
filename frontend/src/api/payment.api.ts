@@ -14,13 +14,15 @@ interface Payment {
 // }
 
 export async function createPayment(payment: Payment) {
-  await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PAY}`, {
+  const res = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PAY}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(payment),
   });
+
+  return await res.json();
 }
 
 export async function confirmPayment(token: string) {
