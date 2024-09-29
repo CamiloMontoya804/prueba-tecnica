@@ -1,28 +1,29 @@
 version: '3'
 services:
+  microservice:
+    build: ./backend/microservice
+    ports:
+      - "4001:4001"
+    environment:
+      - DATABASE_URL=mongodb+srv://prueba_tecnica:q4VQyIsFmEVyzZZ7@cluster0.snyjd.mongodb.net/prueba_tecnica?retryWrites=true&w=majority
+      - PORT=4001
+
   api:
     build: ./backend/api-rest
     ports:
       - "4000:4000"
     depends_on:
       - microservice
-    networks:
-      - mynetwork
-
-  microservice:
-    build: ./backend/microservice
-    ports:
-      - "4001:4001"
-    networks:
-      - mynetwork
+    environment:
+      - PORT=4000
+      - CUSTOMER_MICROSERVICE_PORT=4001
+      - CUSTOMER_MICROSERVICE_HOST=microservice
 
   frontend:
     build: ./frontend
     ports:
       - "3000:3000"
+    depends_on:
+      - api
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:4000
-
-networks:
-  mynetwork:
-    driver: bridge
+      - NEXT_PUBLIC_API_BASE_URL=http://api:4000/api
