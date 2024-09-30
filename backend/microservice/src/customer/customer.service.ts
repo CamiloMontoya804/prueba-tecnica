@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
-import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { PaginationDto } from 'src/common';
 import { QueryDto } from 'src/common/dto/query.dto';
 
@@ -39,20 +39,9 @@ export class CustomerService {
   }
 
   async checkBalance( query: QueryDto ) {
-    const { document, phone } = query;
-    return await this.prisma.customer.findFirstOrThrow({
-      where: {
-        document: document,
-        phone: phone
-      },
-      select: {
-        id: true,
-        name: true,
-        phone: true,
-        balance: true,
-        payments: true,
-      }
-    });
+    const { balance, payments } = await this.findCustomer(query);
+    
+    return { balance, payments };
   }
 
   create(createCustomerDto: CreateCustomerDto) {
@@ -67,9 +56,10 @@ export class CustomerService {
     });
   }
 
-  async addFunds( updateCustomerDto: UpdateCustomerDto ) {
-    const { document, phone, amount } = updateCustomerDto;
-    const { id, balance } = await this.prisma.customer.findFirstOrThrow({
+  async findCustomer(query: QueryDto) {
+    const { document, phone } = query;
+
+    const customer = await this.prisma.customer.findFirst({
       where: {
         document: document,
         phone: phone
@@ -77,13 +67,26 @@ export class CustomerService {
       select: {
         id: true,
         balance: true,
+        payments: true,
+        email: true,
       }
     });
-    const newBalance = balance + amount;
 
-    return await this.prisma.customer.update({
+    if ( !customer ) {
+      throw new RpcException({
+        status: HttpStatus.BAD_REQUEST,
+        title: 'ERROR',
+        message: `Customer not found`,
+      })
+    }
+
+    return customer;
+  }
+
+  async updateBalance(customerId: string, newBalance: number) {
+    await this.prisma.customer.update({
       where: {
-        id: id
+        id: customerId,
       },
       data: {
         balance: newBalance,

@@ -3,7 +3,6 @@ import { MessagePattern, Payload } from '@nestjs/microservices';
 
 import { CustomerService } from './customer.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
-import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { PaginationDto } from 'src/common';
 import { QueryDto } from 'src/common/dto/query.dto';
 
@@ -24,10 +23,5 @@ export class CustomerController {
   @MessagePattern({ cmd: 'create_customer' })
   create(@Payload() createCustomerDto: CreateCustomerDto) {
     return this.customerService.create(createCustomerDto);
-  }
-
-  @MessagePattern({ cmd: 'add_funds' })
-  addFunds(@Payload() updateCustomerDto: UpdateCustomerDto) {
-    return this.customerService.addFunds(updateCustomerDto);
   }
 }
