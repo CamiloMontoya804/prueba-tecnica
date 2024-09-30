@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
-import * as nodemailer from 'nodemailer';
 
-import { Status } from '@prisma/client';
+import { Status, Type } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { CustomerService } from 'src/customer/customer.service';
+import { MailService } from 'src/mail/mail.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { ConfirmPaymentDto } from './dto/confirm-payment.dto';
 import { generateAlphanumericToken } from 'src/utils/utils';
@@ -13,22 +14,13 @@ export class PaymentService {
 
   constructor(
     private prisma: PrismaService,
+    private customerService: CustomerService,
+    private mailService: MailService,
   ) {}
 
   async createPayment(createPaymentDto: CreatePaymentDto) {
     const { document, phone, amount } = createPaymentDto;
-    const { id, balance, payments, email } = await this.prisma.customer.findFirstOrThrow({
-      where: {
-        document: document,
-        phone: phone
-      },
-      select: {
-        id: true,
-        email: true,
-        balance: true,
-        payments: true,
-      }
-    });
+    const { id, balance, payments, email } = await this.customerService.findCustomer({ document, phone })
     const pendingAmount = payments.reduce((total, payment) => {
       if (payment.status === Status.PENDING) {
         return total + payment.amount;
@@ -38,10 +30,11 @@ export class PaymentService {
     const newBalance = balance - (pendingAmount + amount);
 
     if (newBalance < 0) {
-      return {
+      throw new RpcException({
+        status: HttpStatus.BAD_REQUEST,
         title: 'ERROR',
         message: 'No tiene fondos suficientes para realizar el pago.',
-      }
+      });
     }
 
     const token = generateAlphanumericToken();
@@ -52,45 +45,48 @@ export class PaymentService {
         code: code,
         token: token,
         amount: amount,
+        type: Type.payment,
         customerId: id,
       },
     });
 
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 587,
-      secure: false,
-      auth: {
-        user: 'perproject2@gmail.com',
-        pass: 'ndmipkhbxbndafwh',
+    return this.mailService.sendPayConfirmationEmail(email, `http://localhost:3000/pay/confirm/${token}`);
+  }
+
+  async addFunds(addFunds: CreatePaymentDto) {
+    const { document, phone, amount } = addFunds;
+    const { id: customerId, balance } = await this.customerService.findCustomer({ document, phone })
+    const newBalance = balance + amount;
+
+    const token = generateAlphanumericToken();
+    const code = generateAlphanumericToken(10);
+    
+    await this.prisma.payment.create({
+      data: {
+        code: code,
+        token: token,
+        amount: amount,
+        type: Type.recharge,
+        status: Status.SUCCESS,
+        customerId: customerId,
       },
     });
 
-    const mailOptions = {
-      from: '"Epayco - Test" <perproject2@gmail.com>',
-      to: email,
-      subject: 'Confirmación de Pago',
-      html: `
-        <p>Su pago ha sido registrado exitosamente</p>
-        <p>Por favor confirme su pago clickando en el siguiente <a href="http://localhost:3000/pay/confirm/${token}">link</a></p>
-      `,
-    };
-
-    try {
-      await transporter.sendMail(mailOptions);
-
-      return {
-        title: 'Exito',
-        message: 'El pago fue realizado correctamente, por favor confirmela con el correo enviado.',
-      }
-    } catch (error) {
-      throw new Error('Hubo un problema al enviar el correo: ' + error.message);
-    }
+    return await this.customerService.updateBalance(customerId, newBalance)
   }
 
   async confirmPayment(confirmPaymentDto: ConfirmPaymentDto) {
     const { token } = confirmPaymentDto;
-    const { id: paymentId, customer, amount } = await this.prisma.payment.findFirstOrThrow({
+    const { id: paymentId, customer, amount } = await this.findPayment(token);
+
+    let { id: customerId, balance } = customer;
+    const newBalance = balance - amount;
+
+    return this.customerService.updateBalance(customerId, newBalance);
+  }
+
+  async findPayment(token: string) {
+    const payment = await this.prisma.payment.findFirstOrThrow({
       where: {
         status: Status.PENDING,
         token: token
@@ -102,25 +98,14 @@ export class PaymentService {
       }
     });
 
-    let { id: customerId, balance } = customer;
-    const newBalance = balance - amount;
+    if ( !payment ) {
+      throw new RpcException({
+        status: HttpStatus.UNAUTHORIZED,
+        title: 'ERROR',
+        message: `Payment not found`,
+      })
+    }
 
-    await this.prisma.customer.update({
-      where: {
-        id: customerId,
-      },
-      data: {
-        balance: newBalance,
-      }
-    });
-
-    return await this.prisma.payment.update({
-      where: {
-        id: paymentId,
-      },
-      data: {
-        status: Status.SUCCESS,
-      }
-    });
+    return payment;
   }
 }

@@ -18,4 +18,9 @@ export class PaymentController {
   confirmPayment(@Payload() confirmPaymentDto: ConfirmPaymentDto) {
     return this.paymentService.confirmPayment(confirmPaymentDto);
   }
+
+  @MessagePattern({ cmd: 'add_funds' })
+  addFunds(@Payload() addFundsDto: CreatePaymentDto) {
+    return this.paymentService.addFunds(addFundsDto);
+  }
 }
