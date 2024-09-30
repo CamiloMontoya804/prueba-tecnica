@@ -5,11 +5,11 @@ import { CheckCircle2 } from 'lucide-react'
 import Link from "next/link";
 
 import { confirmPayment } from "@/api/payment.api";
-import { formatDate, formatTime } from "@/utils/utils";
+import { formatDate, formatTime, translation } from "@/utils/utils";
 
 interface Payment {
   code: string
-  description: string
+  type: string
   amount: number
   status: string
   updated_at: string
@@ -49,7 +49,7 @@ async function PaymentConfirmation({ params }: Props) {
           </div>
           <div className="space-y-2">
             <p className="text-sm font-medium text-gray-500">Motivo</p>
-            <p className="text-lg">Pago</p>
+            <p className="text-lg">{translation(payment.type)}</p>
           </div>
           <div className="space-y-2">
             <p className="text-sm font-medium text-gray-500">Monto</p>

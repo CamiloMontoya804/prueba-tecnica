@@ -24,7 +24,7 @@ interface BalanceData {
   payments: Array<{
     id: number
     updated_at: string
-    description: string
+    type: string
     status: string
     amount: number
   }>
@@ -63,7 +63,7 @@ export default function BalanceCheck() {
       console.error("Error al registrar el cliente:", err);
       toast({
         title: "Error",
-        description: "Hubo un problema al registrar el cliente.",
+        description: "Hubo un problema al consultar el saldo.",
         variant: "destructive",
       });
     }
@@ -134,8 +134,8 @@ export default function BalanceCheck() {
                       <TableRow key={payment.id}>
                         <TableCell>{formatDate(payment.updated_at)}</TableCell>
                         <TableCell>{formatTime(payment.updated_at)}</TableCell>
-                        <TableCell>Pago</TableCell>
-                        <TableCell className="text-red-600">
+                        <TableCell>{payment.type}</TableCell>
+                        <TableCell className={payment.type == 'recharge' ? "text-green-600" : "text-red-600"}>
                           ${Math.abs(payment.amount).toFixed(2)}
                         </TableCell>
                       </TableRow>
