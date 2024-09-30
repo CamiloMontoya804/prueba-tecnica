@@ -1,11 +1,11 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, Inject, Query, NotFoundException } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { Controller, Get, Post, Body, Param, Inject, Query } from '@nestjs/common';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { ApiTags } from '@nestjs/swagger';
 
 import { CUSTOMER_MICROSERVICE } from 'src/config';
 import { CreateCustomerDto } from '../dto/create-customer.dto';
-import { UpdateCustomerDto } from '../dto/update-customer.dto';
 import { PaginationDto } from 'src/common';
+import { catchError } from 'rxjs';
 
 @ApiTags('Customer')
 @Controller('customer')
@@ -22,16 +22,14 @@ export class CustomerController {
     @Param('document') document: string,
     @Param('phone') phone: string,
   ) {
-    return this.client.send({ cmd: 'check_balance' }, { document, phone });
+    return this.client.send({ cmd: 'check_balance' }, { document, phone })
+      .pipe(
+        catchError( err => { throw new RpcException(err) })
+      )
   }
 
   @Post()
   create(@Body() createCustomerDto: CreateCustomerDto) {
     return this.client.send({ cmd: 'create_customer' }, createCustomerDto);
-  }
-
-  @Post('add-funds')
-  update(@Body() updateCustomerDto: UpdateCustomerDto) {
-    return this.client.send({ cmd: 'add_funds' }, updateCustomerDto);
   }
 }

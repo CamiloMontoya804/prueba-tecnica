@@ -7,8 +7,8 @@ export class RpcCustomExceptionFilter implements RpcExceptionFilter<RpcException
 
   catch(exception: RpcException, host: ArgumentsHost): Observable<any> {
     const ctx = host.switchToHttp();
-    const response = ctx.getResponse()
-    const rpcError = exception.getError()
+    const response = ctx.getResponse();
+    const rpcError = exception.getError();
 
     if (
       typeof rpcError === 'object' && 

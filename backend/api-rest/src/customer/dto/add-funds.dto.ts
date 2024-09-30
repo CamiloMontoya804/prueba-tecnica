@@ -3,7 +3,7 @@ import { IsNotEmpty, IsNumber, IsPositive, IsString, Length } from 'class-valida
 
 import { CreateCustomerDto } from './create-customer.dto';
 
-export class UpdateCustomerDto extends PartialType(CreateCustomerDto) {
+export class AddFundsDto extends PartialType(CreateCustomerDto) {
 
   @IsNotEmpty()
   @IsString()
