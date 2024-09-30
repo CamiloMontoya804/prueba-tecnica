@@ -34,13 +34,22 @@ export async function getCustomerBalance(params: BalanceParams) {
 }
 
 export async function addFunds(params: BalanceParams) {
-  await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ADD_FUNDS}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(params),
-  });
+  try {
+    const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ADD_FUNDS}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(params),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Error al hacer la recarga de billetera.');
+    }
+  } catch (error) {
+    throw error;
+  }
 }
 
 export async function createCustomer(customerData: CustomerData) {
