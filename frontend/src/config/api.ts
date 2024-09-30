@@ -4,7 +4,7 @@ export const API_CONFIG = {
     CUSTOMERS: '/customer',
     REGISTER: '/customer',
     BALANCE: (document: string, phone: string) => `/customer/balance/${document}/${phone}`,
-    ADD_FUNDS: '/customer/add-funds',
+    ADD_FUNDS: '/pay/add-funds',
     PAY: '/pay',
     CONFIRM: '/pay/confirm',
   }
